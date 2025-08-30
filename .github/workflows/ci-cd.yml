@@ -32,15 +32,15 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build Docker image
-        run: docker build -t your-app:${{ github.sha }} .
+        run: docker build -t vegawebsite:${{ github.sha }} .
 
       - name: Tag Docker image for ECR
         run: |
-          docker tag your-app:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-app:${{ github.sha }}
+          docker tag vegawebsite:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/vegawebsite:${{ github.sha }}
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-app:${{ github.sha }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/vegawebsite:${{ github.sha }}
 
       - name: Deploy to ECS
         env:
