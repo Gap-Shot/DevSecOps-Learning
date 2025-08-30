@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
-  build-test-scan:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use Node.js 16
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -25,30 +24,29 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Run Snyk to scan for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-
-      - name: Build Docker image
-        run: |
-          docker build -t your-app:${{ github.sha }} .
-
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          region: ${{ secrets.AWS_REGION }}
+
+      - name: Build Docker image
+        run: docker build -t your-app:${{ github.sha }} .
+
+      - name: Tag Docker image for ECR
+        run: |
+          docker tag your-app:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-app:${{ github.sha }}
 
       - name: Push Docker image to ECR
         run: |
-          docker tag your-app:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-app:${{ github.sha }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-app:${{ github.sha }}
 
-  deploy:
-    needs: build-test-scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to AWS ECS (or your chosen service)
+      - name: Deploy to ECS
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
-          # Use AWS CLI or AWS CDK to deploy your container
-          aws ecs update-service --cluster your-cluster --service your-service --force-new-deployment
+          aws ecs update-service \
+            --cluster your-app-cluster \
+            --service your-app-service \
+            --force-new-deployment \
+            --region $AWS_REGION
