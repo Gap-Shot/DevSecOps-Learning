@@ -1,0 +1,15 @@
+{
+  "name": "vegawebsite",
+  "version": "1.0.0",
+  "description": "A simple JavaScript web app for learning DevSecOps",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
