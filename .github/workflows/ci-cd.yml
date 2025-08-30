@@ -46,7 +46,7 @@ jobs:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           aws ecs update-service \
-            --cluster your-app-cluster \
-            --service your-app-service \
+            --cluster accurate-tiger-hzh4jz \
+            --service vegawebsite-service-uhbvhprq \
             --force-new-deployment \
             --region $AWS_REGION
