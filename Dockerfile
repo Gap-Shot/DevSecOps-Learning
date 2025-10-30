@@ -1,5 +1,5 @@
 # Use official nginx image
-FROM nginx:alpine
+FROM nginx:1.29.3-alpine3.22
 
 # Remove default nginx static files
 RUN rm -rf /usr/share/nginx/html/*
